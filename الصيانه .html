@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>طلبات الصيانة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF1F0; --surface:#FFFFFF; --ink:#18292B; --muted:#5D6F70; --line:#D3DCDA;
+  --teal:#1E5D58; --teal-soft:#DDEBE8; --orange:#D9751E; --orange-soft:#FBE9D8;
+  --done:#6B7F7A; --done-soft:#E4E9E7; --danger:#B3261E;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0F1B1C; --surface:#172728; --ink:#E6EEEC; --muted:#9AB0AD; --line:#2A3E3F;
+    --teal:#5DB5AB; --teal-soft:#1D3B39; --orange:#F0A055; --orange-soft:#3A2818;
+    --done:#90A39E; --done-soft:#24302E; --danger:#F2867E;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;font-size:16px;line-height:1.7}
+a{color:var(--teal)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+
+header{background:var(--teal);color:#fff}
+.bar{max-width:880px;margin:0 auto;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:1.15rem;display:flex;align-items:center;gap:10px}
+.brand svg{flex:none}
+nav{display:flex;gap:6px}
+nav a{color:#fff;text-decoration:none;padding:6px 14px;border-radius:999px;font-size:.95rem;opacity:.85}
+nav a.on{background:rgba(255,255,255,.18);opacity:1}
+@media (prefers-color-scheme:dark){header{background:#123432}}
+
+main{max-width:880px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:1.7rem;line-height:1.3;margin:0 0 6px}
+.lead{color:var(--muted);margin:0 0 26px}
+h2{font-size:1.1rem;margin:0 0 12px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.step{margin-bottom:26px}
+.step-label{font-weight:600;margin-bottom:10px;display:block}
+
+.services{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.svc{position:relative}
+.svc input{position:absolute;opacity:0;inset:0}
+.svc label{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;border:2px solid var(--line);border-radius:12px;cursor:pointer;text-align:center;font-weight:500;background:var(--surface);transition:border-color .15s,background .15s}
+.svc svg{width:30px;height:30px;stroke:var(--teal)}
+.svc input:checked+label{border-color:var(--orange);background:var(--orange-soft)}
+.svc input:checked+label svg{stroke:var(--orange)}
+.svc input:focus-visible+label{outline:3px solid var(--orange);outline-offset:2px}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:600px){.grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px}
+.field.full{grid-column:1/-1}
+.field label{font-size:.93rem;font-weight:500}
+.field small{color:var(--muted);font-size:.82rem}
+input[type=text],input[type=tel],input[type=email],input[type=password],input[type=date],input[type=time],select,textarea{
+  width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);min-height:46px}
+textarea{min-height:96px;resize:vertical}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:12px 22px;font-weight:600;cursor:pointer;min-height:46px}
+.btn-main{background:var(--orange);color:#fff}
+.btn-teal{background:var(--teal);color:#fff}
+@media (prefers-color-scheme:dark){.btn-main,.btn-teal{color:#10201F}}
+.btn-ghost{background:transparent;border:1px solid var(--line)}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn-sm{padding:7px 14px;min-height:38px;font-size:.92rem}
+.msg{margin-top:12px;font-size:.95rem}
+.msg.err{color:var(--danger)}
+
+.ticket{text-align:center;padding:34px 22px}
+.code{font-size:2rem;font-weight:700;letter-spacing:.08em;direction:ltr;display:inline-block;background:var(--orange-soft);color:var(--orange);padding:8px 22px;border-radius:12px;margin:12px 0}
+
+.badge{display:inline-block;font-size:.82rem;font-weight:600;padding:3px 12px;border-radius:999px}
+.s-new{background:var(--orange-soft);color:var(--orange)}
+.s-scheduled{background:var(--teal-soft);color:var(--teal)}
+.s-done{background:var(--done-soft);color:var(--done)}
+
+/* admin */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;text-align:right}
+.stat b{display:block;font-size:1.6rem;line-height:1.2}
+.stat span{color:var(--muted);font-size:.9rem}
+.stat.on{border-color:var(--ink)}
+.stat.new b{color:var(--orange)} .stat.scheduled b{color:var(--teal)} .stat.done b{color:var(--done)}
+.tools{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.tools input{flex:1;min-width:180px}
+.list{display:flex;flex-direction:column;gap:12px}
+.req{background:var(--surface);border:1px solid var(--line);border-inline-start:5px solid var(--orange);border-radius:12px;padding:16px 18px}
+.req.scheduled{border-inline-start-color:var(--teal)}
+.req.done{border-inline-start-color:var(--done);opacity:.85}
+.req-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.req-title{font-weight:700;font-size:1.05rem}
+.req-code{direction:ltr;display:inline-block;color:var(--muted);font-size:.85rem;margin-inline-start:6px}
+.req dl{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;margin:12px 0;font-size:.94rem}
+.req dt{color:var(--muted)}
+.req dd{margin:0;overflow-wrap:anywhere}
+.desc{background:var(--bg);border-radius:8px;padding:10px 12px;margin:8px 0;white-space:pre-wrap;font-size:.95rem}
+.appt{background:var(--teal-soft);color:var(--teal);border-radius:8px;padding:8px 12px;font-weight:600;font-size:.95rem;margin:8px 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sched-form{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.sched-form.open{display:block}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+.top-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:0 20px 30px}
+footer a{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>
+      <span id="company">طلبات الصيانة</span>
+    </div>
+    <nav>
+      <a href="#" data-nav="request">طلب صيانة</a>
+      <a href="#track" data-nav="track">تتبّع طلبك</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- طلب صيانة -->
+  <section id="view-request">
+    <div id="req-form-wrap">
+      <h1>اطلب صيانة لوحدتك</h1>
+      <p class="lead">اختر نوع الخدمة واكتب بياناتك، وفريق الصيانة يتواصل معك لتحديد الموعد.</p>
+      <form id="req-form" class="panel" novalidate>
+        <div class="step">
+          <span class="step-label">نوع الخدمة</span>
+          <div class="services" id="services"></div>
+        </div>
+        <div class="step">
+          <span class="step-label">بياناتك</span>
+          <div class="grid">
+            <div class="field"><label for="f-name">الاسم</label><input id="f-name" type="text" maxlength="80" autocomplete="name" required></div>
+            <div class="field"><label for="f-phone">رقم الجوال</label><input id="f-phone" type="tel" inputmode="numeric" maxlength="10" placeholder="05xxxxxxxx" dir="ltr" autocomplete="tel" required></div>
+            <div class="field"><label for="f-project">المشروع أو المبنى</label><input id="f-project" type="text" maxlength="80" required></div>
+            <div class="field"><label for="f-unit">رقم الوحدة</label><input id="f-unit" type="text" maxlength="20" required></div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-label">تفاصيل المشكلة</span>
+          <div class="grid">
+            <div class="field full"><label for="f-desc">وصف المشكلة</label><textarea id="f-desc" maxlength="1000" placeholder="مثال: تسريب ماء تحت مغسلة المطبخ من يومين" required></textarea></div>
+            <div class="field"><label for="f-date">اليوم المفضّل للزيارة</label><input id="f-date" type="date"><small>اختياري</small></div>
+            <div class="field"><label for="f-time">الوقت المفضّل</label>
+              <select id="f-time"><option>أي وقت</option><option>صباحًا</option><option>بعد الظهر</option><option>مساءً</option></select></div>
+          </div>
+        </div>
+        <button class="btn btn-main" type="submit" id="req-submit">إرسال الطلب</button>
+        <div class="msg err" id="req-msg" role="alert"></div>
+      </form>
+    </div>
+    <div id="req-done" class="panel ticket hidden">
+      <h1>وصلنا طلبك</h1>
+      <p class="lead" style="margin:0">احتفظ برقم الطلب لتتبّع حالته:</p>
+      <div class="code" id="done-code"></div>
+      <div class="actions" style="justify-content:center">
+        <button class="btn btn-ghost btn-sm" id="copy-code" type="button">نسخ الرقم</button>
+        <a class="btn btn-ghost btn-sm" id="track-link" href="#track">تتبّع الطلب</a>
+        <button class="btn btn-ghost btn-sm" id="new-req" type="button">طلب جديد</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- تتبع -->
+  <section id="view-track" class="hidden">
+    <h1>تتبّع طلبك</h1>
+    <p class="lead">اكتب رقم الطلب اللي وصلك بعد الإرسال.</p>
+    <form id="track-form" class="panel" novalidate>
+      <div class="field"><label for="t-code">رقم الطلب</label><input id="t-code" type="text" dir="ltr" placeholder="M-XXXXXXXX" maxlength="12" autocapitalize="characters"></div>
+      <button class="btn btn-teal" style="margin-top:14px" type="submit">عرض الحالة</button>
+      <div class="msg" id="track-msg" role="status"></div>
+    </form>
+  </section>
+
+  <!-- الإدارة -->
+  <section id="view-admin" class="hidden">
+    <div id="login-wrap">
+      <h1>دخول مسؤول الصيانة</h1>
+      <p class="lead">هذه الصفحة للإدارة فقط.</p>
+      <form id="login-form" class="panel" novalidate>
+        <div class="grid">
+          <div class="field"><label for="l-email">البريد</label><input id="l-email" type="email" dir="ltr" autocomplete="username"></div>
+          <div class="field"><label for="l-pass">كلمة المرور</label><input id="l-pass" type="password" dir="ltr" autocomplete="current-password"></div>
+        </div>
+        <button class="btn btn-teal" style="margin-top:14px" type="submit">دخول</button>
+        <div class="msg err" id="login-msg" role="alert"></div>
+      </form>
+    </div>
+    <div id="admin-wrap" class="hidden">
+      <div class="top-row">
+        <h1 style="margin:0">طلبات الصيانة</h1>
+        <button class="btn btn-ghost btn-sm" id="logout" type="button">تسجيل الخروج</button>
+      </div>
+      <div class="stats">
+        <button class="stat new on" data-filter="new" type="button"><b id="c-new">0</b><span>جديدة</span></button>
+        <button class="stat scheduled" data-filter="scheduled" type="button"><b id="c-scheduled">0</b><span>مجدولة</span></button>
+        <button class="stat done" data-filter="done" type="button"><b id="c-done">0</b><span>منتهية</span></button>
+      </div>
+      <div class="tools">
+        <input type="text" id="search" placeholder="ابحث بالاسم أو الجوال أو الوحدة أو رقم الطلب">
+        <button class="btn btn-ghost btn-sm" data-filter="all" type="button" id="show-all">عرض الكل</button>
+      </div>
+      <div class="list" id="list"></div>
+    </div>
+  </section>
+</main>
+<footer><a href="#admin">دخول الإدارة</a></footer>
+
+<script type="module">
+/* ================== الإعدادات — عدّلها ================== */
+const COMPANY_NAME = "صيانة شركة جدة الأولى";          // اسم شركتك يظهر أعلى الصفحة
+const firebaseConfig = {
+  apiKey: "AIzaSyAur6TkaEEQfFCJKjTGvW1x7rb_EGDPSiw",
+  authDomain: "jeddah-first-company.firebaseapp.com",
+  projectId: "jeddah-first-company",
+  storageBucket: "jeddah-first-company.firebasestorage.app",
+  messagingSenderId: "566574999770",
+  appId: "1:566574999770:web:32ee94ca72bf11e46c9de3"
+};
+const SERVICES = [
+  {id:"plumbing", name:"سباكة", icon:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>'},
+  {id:"electric", name:"كهرباء", icon:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>'},
+  {id:"ac", name:"تكييف", icon:'<path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5M9 4l3 2 3-2M9 20l3-2 3 2"/>'},
+  {id:"carpentry", name:"نجارة وأبواب", icon:'<rect x="6" y="2" width="12" height="20" rx="1"/><circle cx="15" cy="12" r="1"/>'},
+  {id:"paint", name:"دهانات", icon:'<rect x="3" y="3" width="15" height="7" rx="1"/><path d="M18 6h3v5h-9v3M11 14h2v7h-2z"/>'},
+  {id:"other", name:"أخرى", icon:'<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>'}
+];
+/* ======================================================== */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, onSnapshot, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const $ = id => document.getElementById(id);
+const STATUS = {new:"جديد", scheduled:"مجدول", done:"منتهي"};
+const svcName = id => (SERVICES.find(s=>s.id===id)||{name:id}).name;
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtDate = d => d ? new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-latn",{weekday:"long",day:"numeric",month:"long"}).format(d) : "";
+const fmtDateTime = ts => ts?.toDate ? new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-latn",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}).format(ts.toDate()) : "";
+const fmtTime = t => { if(!t) return ""; const [h,m]=t.split(":").map(Number); return `${((h+11)%12)+1}:${String(m).padStart(2,"0")} ${h<12?"ص":"م"}`; };
+const apptText = r => r.apptDate ? `${fmtDate(new Date(r.apptDate+"T12:00"))}${r.apptTime?" الساعة "+fmtTime(r.apptTime):""}` : "";
+
+$("company").textContent = COMPANY_NAME;
+document.title = COMPANY_NAME + " — طلبات الصيانة";
+
+/* ---------- التنقل ---------- */
+function route(){
+  const h = location.hash.replace("#","") || "request";
+  const v = ["request","track","admin"].includes(h) ? h : "request";
+  for (const k of ["request","track","admin"]) $("view-"+k).classList.toggle("hidden", k!==v);
+  document.querySelectorAll("[data-nav]").forEach(a => a.classList.toggle("on", a.dataset.nav===v));
+  window.scrollTo(0,0);
+}
+addEventListener("hashchange", route); route();
+
+/* ---------- نموذج العميل ---------- */
+$("services").innerHTML = SERVICES.map(s => `
+  <div class="svc"><input type="radio" name="svc" id="svc-${s.id}" value="${s.id}">
+  <label for="svc-${s.id}"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${s.icon}</svg>${s.name}</label></div>`).join("");
+$("f-date").min = new Date().toISOString().slice(0,10);
+$("f-phone").addEventListener("input", e => e.target.value = e.target.value.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/\D/g,""));
+
+function newCode(){
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const arr = crypto.getRandomValues(new Uint32Array(8));
+  return "M-" + Array.from(arr, n => chars[n % chars.length]).join("");
+}
+
+$("req-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const msg = $("req-msg"); msg.textContent = "";
+  const service = document.querySelector('input[name=svc]:checked')?.value;
+  const data = {
+    service, name:$("f-name").value.trim(), phone:$("f-phone").value.trim(),
+    project:$("f-project").value.trim(), unit:$("f-unit").value.trim(),
+    description:$("f-desc").value.trim(), prefDate:$("f-date").value, prefTime:$("f-time").value
+  };
+  if (!service) return msg.textContent = "اختر نوع الخدمة.";
+  if (!data.name || !data.project || !data.unit || !data.description) return msg.textContent = "عبّ كل الخانات المطلوبة.";
+  if (!/^05\d{8}$/.test(data.phone)) return msg.textContent = "رقم الجوال لازم يبدأ بـ 05 ويتكون من 10 أرقام.";
+  const btn = $("req-submit"); btn.disabled = true; btn.textContent = "جارٍ الإرسال…";
+  try {
+    const code = newCode();
+    await setDoc(doc(db,"requests",code), {...data, status:"new", createdAt:serverTimestamp()});
+    $("done-code").textContent = code;
+    trySet("lastCode", code);
+    $("req-form-wrap").classList.add("hidden"); $("req-done").classList.remove("hidden");
+    $("req-form").reset();
+  } catch(err) {
+    console.error(err); msg.textContent = "ما قدرنا نرسل الطلب. تأكد من اتصالك بالإنترنت وحاول مرة ثانية.";
+  } finally { btn.disabled = false; btn.textContent = "إرسال الطلب"; }
+});
+function trySet(k,v){ try{ localStorage.setItem(k,v); }catch{} }
+function tryGet(k){ try{ return localStorage.getItem(k); }catch{ return null; } }
+$("copy-code").onclick = async () => { try{ await navigator.clipboard.writeText($("done-code").textContent); $("copy-code").textContent="تم النسخ"; }catch{} };
+$("new-req").onclick = () => { $("req-done").classList.add("hidden"); $("req-form-wrap").classList.remove("hidden"); $("copy-code").textContent="نسخ الرقم"; };
+
+/* ---------- التتبع ---------- */
+if (tryGet("lastCode")) $("t-code").value = tryGet("lastCode");
+$("track-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const out = $("track-msg");
+  let code = $("t-code").value.trim().toUpperCase();
+  if (code && !code.startsWith("M-")) code = "M-" + code.replace(/^M/,"");
+  if (code.length < 10) { out.innerHTML = `<span style="color:var(--danger)">اكتب رقم الطلب كامل، مثل M-AB12CD34.</span>`; return; }
+  out.textContent = "جارٍ البحث…";
+  try {
+    const snap = await getDoc(doc(db,"requests",code));
+    if (!snap.exists()) { out.innerHTML = `<span style="color:var(--danger)">ما لقينا طلب بهذا الرقم. تأكد منه وحاول مرة ثانية.</span>`; return; }
+    const r = snap.data();
+    let line = r.status==="new" ? "استلمنا طلبك، وبنتواصل معك لتحديد الموعد."
+      : r.status==="scheduled" ? `موعد الزيارة: ${esc(apptText(r))}`
+      : "تم إنجاز الطلب. شكرًا لك.";
+    out.innerHTML = `<div style="margin-top:6px"><span class="badge s-${r.status}">${STATUS[r.status]}</span>
+      <p style="margin:10px 0 0"><b>${esc(svcName(r.service))}</b>، ${esc(r.project)} وحدة ${esc(r.unit)}</p><p style="margin:4px 0 0">${line}</p></div>`;
+  } catch(err) { console.error(err); out.innerHTML = `<span style="color:var(--danger)">تعذّر عرض الحالة. حاول بعد قليل.</span>`; }
+});
+
+/* ---------- الإدارة ---------- */
+let all = [], filter = "new", unsub = null;
+$("login-form").addEventListener("submit", async e => {
+  e.preventDefault(); $("login-msg").textContent = "";
+  try { await signInWithEmailAndPassword(auth, $("l-email").value.trim(), $("l-pass").value); }
+  catch { $("login-msg").textContent = "البريد أو كلمة المرور غير صحيحة."; }
+});
+$("logout").onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, user => {
+  $("login-wrap").classList.toggle("hidden", !!user);
+  $("admin-wrap").classList.toggle("hidden", !user);
+  if (unsub) { unsub(); unsub = null; }
+  if (!user) return;
+  unsub = onSnapshot(query(collection(db,"requests"), orderBy("createdAt","desc")),
+    snap => { all = snap.docs.map(d => ({id:d.id, ...d.data()})); render(); },
+    err => { console.error(err); $("list").innerHTML = `<div class="empty">تعذّر تحميل الطلبات. تأكد من قواعد Firestore.</div>`; });
+});
+
+document.querySelectorAll("[data-filter]").forEach(b => b.onclick = () => { filter = b.dataset.filter; render(); });
+$("search").addEventListener("input", render);
+
+function render(){
+  for (const s of ["new","scheduled","done"]) $("c-"+s).textContent = all.filter(r=>r.status===s).length;
+  document.querySelectorAll(".stat").forEach(b => b.classList.toggle("on", b.dataset.filter===filter));
+  const q = $("search").value.trim().toLowerCase();
+  let rows = all.filter(r => filter==="all" || r.status===filter);
+  if (q) rows = rows.filter(r => [r.id,r.name,r.phone,r.unit,r.project].join(" ").toLowerCase().includes(q));
+  if (filter==="scheduled") rows.sort((a,b) => (a.apptDate+a.apptTime).localeCompare(b.apptDate+b.apptTime));
+  if (!rows.length) { $("list").innerHTML = `<div class="empty">${q ? "ما فيه نتائج لهذا البحث." : filter==="new" ? "ما فيه طلبات جديدة حاليًا." : "ما فيه طلبات هنا."}</div>`; return; }
+  $("list").innerHTML = rows.map(card).join("");
+}
+
+function card(r){
+  const wa = "966" + String(r.phone||"").replace(/^0/,"");
+  return `<article class="req ${r.status}" data-id="${esc(r.id)}">
+    <div class="req-top">
+      <div><span class="req-title">${esc(svcName(r.service))}</span><span class="req-code">${esc(r.id)}</span></div>
+      <span class="badge s-${r.status}">${STATUS[r.status]}</span>
+    </div>
+    <dl>
+      <dt>العميل</dt><dd>${esc(r.name)}</dd>
+      <dt>الجوال</dt><dd><a href="tel:${esc(r.phone)}" dir="ltr">${esc(r.phone)}</a> · <a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">واتساب</a></dd>
+      <dt>الموقع</dt><dd>${esc(r.project)}، وحدة ${esc(r.unit)}</dd>
+      <dt>المفضّل</dt><dd>${r.prefDate ? esc(fmtDate(new Date(r.prefDate+"T12:00")))+"، " : ""}${esc(r.prefTime)}</dd>
+      <dt>وصل</dt><dd>${esc(fmtDateTime(r.createdAt))}</dd>
+    </dl>
+    <div class="desc">${esc(r.description)}</div>
+    ${r.apptDate ? `<div class="appt">الموعد: ${esc(apptText(r))}${r.tech ? " · الفني: "+esc(r.tech) : ""}</div>` : ""}
+    ${r.adminNote ? `<div class="desc">ملاحظة: ${esc(r.adminNote)}</div>` : ""}
+    <div class="actions">
+      ${r.status!=="done" ? `<button class="btn btn-teal btn-sm" data-act="sched" type="button">${r.status==="scheduled"?"تعديل الموعد":"جدولة موعد"}</button>
+        <button class="btn btn-main btn-sm" data-act="done" type="button">تم الإنجاز</button>`
+      : `<button class="btn btn-ghost btn-sm" data-act="reopen" type="button">إعادة فتح الطلب</button>`}
+    </div>
+    <form class="sched-form" data-form novalidate>
+      <div class="grid">
+        <div class="field"><label>التاريخ</label><input type="date" name="d" value="${esc(r.apptDate||r.prefDate||"")}" required></div>
+        <div class="field"><label>الوقت</label><input type="time" name="t" value="${esc(r.apptTime||"")}"></div>
+        <div class="field"><label>الفني</label><input type="text" name="tech" maxlength="60" value="${esc(r.tech||"")}"></div>
+        <div class="field"><label>ملاحظة</label><input type="text" name="note" maxlength="300" value="${esc(r.adminNote||"")}"></div>
+      </div>
+      <div class="actions"><button class="btn btn-teal btn-sm" type="submit">حفظ الموعد</button><button class="btn btn-ghost btn-sm" type="button" data-act="cancel">إلغاء</button></div>
+    </form>
+  </article>`;
+}
+
+$("list").addEventListener("click", async e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const el = b.closest(".req"), id = el.dataset.id, ref = doc(db,"requests",id);
+  const act = b.dataset.act;
+  if (act==="sched") return el.querySelector("[data-form]").classList.add("open");
+  if (act==="cancel") return el.querySelector("[data-form]").classList.remove("open");
+  b.disabled = true;
+  try {
+    if (act==="done") await updateDoc(ref, {status:"done", doneAt:serverTimestamp()});
+    if (act==="reopen") await updateDoc(ref, {status: all.find(r=>r.id===id)?.apptDate ? "scheduled" : "new"});
+  } catch(err){ console.error(err); alert("ما تم الحفظ. حاول مرة ثانية."); b.disabled = false; }
+});
+$("list").addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = e.target, id = f.closest(".req").dataset.id;
+  if (!f.d.value) return f.d.focus();
+  try {
+    await updateDoc(doc(db,"requests",id), {status:"scheduled", apptDate:f.d.value, apptTime:f.t.value, tech:f.tech.value.trim(), adminNote:f.note.value.trim()});
+  } catch(err){ console.error(err); alert("ما تم حفظ الموعد. حاول مرة ثانية."); }
+});
+</script>
+</body>
+</html>
